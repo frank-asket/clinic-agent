@@ -1,6 +1,18 @@
+---
+title: Clinic Agent
+emoji: 🏥
+colorFrom: green
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Clinic Agent
 
 A demo **clinic appointment booking** assistant: a **Streamlit** chat UI drives a **LangGraph** agent that talks to **OpenAI** (for intent and wording) and a local **SQLite** database for doctors, customers, and bookings.
+
+The block above is **[Hugging Face Spaces](https://huggingface.co/docs/hub/spaces) metadata** (YAML front matter). **Hugging Face** hosts this app as a **Docker Space** ([`Dockerfile`](Dockerfile)); it does not affect local `streamlit run` usage.
 
 ## Requirements
 
@@ -49,6 +61,23 @@ With an activated venv, use `streamlit run app.py` and `streamlit run admin_app.
 The UI initializes the database on startup (see `data/db.py`). The SQLite file is stored as `data/clinic.db`.
 
 **Note:** Use `streamlit run` so the Streamlit server and session behave correctly.
+
+### Hugging Face Spaces
+
+The Space uses the **Docker** SDK ([`Dockerfile`](Dockerfile)) because the Hub only allows `gradio`, `docker`, or `static` as native SDK types. The container runs **`app.py`** (patient chat) on port **7860**. The staff **`admin_app.py`** is not started in the Space; run it separately if you need it.
+
+1. On [Hugging Face](https://huggingface.co), use **Spaces → New Space** (or **Create new Space** on your profile) with **Docker** as the SDK, or push this repo to a Space Git remote (see below).
+2. Open the Space **Settings → Variables and secrets** and add a **secret** named **`OPENAI_API_KEY`** with your [OpenAI API key](https://platform.openai.com/api-keys). Secrets are available as environment variables at runtime (no `.env` file in the image).
+
+**CLI:** with the [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/guides/cli) logged in, create the Space and push:
+
+```bash
+hf repos create YOUR_USERNAME/clinic-agent --repo-type space --space-sdk docker --exist-ok
+git remote add huggingface https://huggingface.co/spaces/YOUR_USERNAME/clinic-agent.git
+git push huggingface main
+```
+
+SQLite data on the Space filesystem is **demo-only** (can be lost on restart or rebuild unless you add [persistent storage](https://huggingface.co/docs/hub/spaces-storage)). For production, use managed storage or your own host.
 
 ### Admin — doctor alerts
 
