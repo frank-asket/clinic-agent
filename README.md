@@ -107,6 +107,24 @@ git remote add huggingface https://huggingface.co/spaces/YOUR_USERNAME/clinic-ag
 git push huggingface main
 ```
 
+**Connect GitHub and Hugging Face (recommended)** — treat **GitHub as source of truth**: push to `main` on GitHub, and GitHub Actions pushes the same commit to the Space.
+
+1. Use this repo on GitHub (e.g. fork or use your GitHub repo as the published `main`).
+2. On GitHub: **Settings → Secrets and variables → Actions → New repository secret**  
+   - Name: **`HF_TOKEN`**  
+   - Value: a [Hugging Face access token](https://huggingface.co/settings/tokens) with **write** permission to [`spaces/franck-asket/clinic-agent`](https://huggingface.co/spaces/franck-asket/clinic-agent).
+3. Merge the workflow [`.github/workflows/sync-huggingface.yml`](.github/workflows/sync-huggingface.yml). Each push to **`main`** runs **Sync to Hugging Face Space** (or run it manually under **Actions**).
+
+To change the Space owner or name, edit the URL in that workflow file. See [Managing Spaces with GitHub Actions](https://huggingface.co/docs/hub/spaces-github-actions).
+
+**Optional — two remotes on your machine** (push both when not using Actions):
+
+```bash
+git remote add github https://github.com/frank-asket/clinic-agent.git   # if missing
+git remote add huggingface https://huggingface.co/spaces/franck-asket/clinic-agent.git
+git push github main && git push huggingface main
+```
+
 SQLite on the Space is **ephemeral** unless you use [persistent storage](https://huggingface.co/docs/hub/spaces-storage) or an external database — treat the hosted instance as a **demo**.
 
 ---

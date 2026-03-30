@@ -1,0 +1,28 @@
+# Sync default branch to Hugging Face Space when you push to GitHub.
+# Docs: https://huggingface.co/docs/hub/spaces-github-actions
+#
+# One-time setup on GitHub: Settings → Secrets and variables → Actions
+#   → New repository secret: HF_TOKEN = a Hugging Face token with write access to the Space.
+
+name: Sync to Hugging Face Space
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git push "https://franck-asket:${HF_TOKEN}@huggingface.co/spaces/franck-asket/clinic-agent" HEAD:main
